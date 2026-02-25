@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Kalasetu{% endblock %}
+
+{% block content %}
+
+<style>
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .dashboard-header h1 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+    
+    .dashboard-header p {
+        color: #7f8c8d;
+        font-size: 16px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: transform 0.2s;
+        border-left: 4px solid #3498db;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+    
+    .stat-card.success {
+        border-left-color: #27ae60;
+    }
+    
+    .stat-card.warning {
+        border-left-color: #f39c12;
+    }
+    
+    .stat-card.danger {
+        border-left-color: #e74c3c;
+    }
+    
+    .stat-card.info {
+        border-left-color: #3498db;
+    }
+    
+    .stat-card h3 {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin: 0 0 10px 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .stat-card .number {
+        font-size: 36px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 10px 0;
+    }
+    
+    .stat-card .subtitle {
+        font-size: 13px;
+        color: #95a5a6;
+    }
+    
+    .section {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+    }
+    
+    .section h2 {
+        color: #2c3e50;
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #ecf0f1;
+    }
+    
+    .role-breakdown {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .role-item {
+        text-align: center;
+        padding: 15px;
+        background: #ecf0f1;
+        border-radius: 5px;
+    }
+    
+    .role-item .role-name {
+        font-size: 12px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    
+    .role-item .role-count {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .pending-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .pending-item {
+        padding: 15px;
+        border: 1px solid #ecf0f1;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .pending-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .product-name {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .artisan-name {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+    
+    .artisan-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .artisan-item {
+        padding: 12px;
+        border-bottom: 1px solid #ecf0f1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .artisan-item:last-child {
+        border-bottom: none;
+    }
+    
+    .artisan-email {
+        font-weight: 500;
+        color: #2c3e50;
+    }
+    
+    .artisan-stats {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+    
+    .btn-success {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background-color: #229954;
+    }
+    
+    .btn-warning {
+        background-color: #f39c12;
+        color: white;
+    }
+    
+    .btn-warning:hover {
+        background-color: #e67e22;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #95a5a6;
+    }
+    
+    .progress-bar {
+        background: #ecf0f1;
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+    
+    .progress-fill {
+        background: linear-gradient(to right, #27ae60, #2ecc71);
+        height: 100%;
+        transition: width 0.3s;
+    }
+
+    .moderation-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .moderation-table th,
+    .moderation-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ecf0f1;
+    }
+
+    .moderation-table th {
+        background: #f8f9fa;
+        color: #2c3e50;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .moderation-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-approve {
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .btn-approve:hover {
+        background-color: #229954;
+    }
+
+    .btn-reject {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .btn-reject:hover {
+        background-color: #c0392b;
+    }
+
+    .action-form {
+        display: inline;
+        margin: 0;
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>🎨 Admin Dashboard</h1>
+    <p>Welcome back, {{ admin_user.email }}! Here's your platform overview.</p>
+</div>
+
+<!-- KEY METRICS -->
+<div class="stats-grid">
+    <div class="stat-card info">
+        <h3>Total Users</h3>
+        <div class="number">{{ total_users }}</div>
+        <div class="subtitle">
+            {% if recent_users_count > 0 %}
+                +{{ recent_users_count }} this week
+            {% else %}
+                Platform users
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="stat-card info">
+        <h3>Total Products</h3>
+        <div class="number">{{ total_products }}</div>
+        <div class="subtitle">
+            {% if recent_products_count > 0 %}
+                +{{ recent_products_count }} this week
+            {% else %}
+                In marketplace
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="stat-card success">
+        <h3>Approved Products</h3>
+        <div class="number">{{ approved_products }}</div>
+        <div class="subtitle">{{ approval_rate }}% approval rate</div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ approval_rate }}%;"></div>
+        </div>
+    </div>
+    
+    <div class="stat-card {% if pending_products > 0 %}warning{% else %}success{% endif %}">
+        <h3>Pending Approval</h3>
+        <div class="number">{{ pending_products }}</div>
+        <div class="subtitle">
+            {% if pending_products > 0 %}
+                Requires review
+            {% else %}
+                All caught up!
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- USER BREAKDOWN BY ROLE -->
+<div class="section">
+    <h2>👥 User Distribution by Role</h2>
+    <div class="role-breakdown">
+        <div class="role-item">
+            <div class="role-name">Admins</div>
+            <div class="role-count">{{ admin_count }}</div>
+        </div>
+        <div class="role-item">
+            <div class="role-name">Artisans</div>
+            <div class="role-count">{{ artisan_count }}</div>
+        </div>
+        <div class="role-item">
+            <div class="role-name">Buyers</div>
+            <div class="role-count">{{ buyer_count }}</div>
+        </div>
+        <div class="role-item">
+            <div class="role-name">Consultants</div>
+            <div class="role-count">{{ consultant_count }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- PRICING STATISTICS -->
+<div class="stats-grid">
+    <div class="stat-card success">
+        <h3>Average Product Price</h3>
+        <div class="number">₹{{ average_price|floatformat:2 }}</div>
+        <div class="subtitle">Across all products</div>
+    </div>
+    
+    <div class="stat-card success">
+        <h3>Total Marketplace Value</h3>
+        <div class="number">₹{{ total_marketplace_value|floatformat:2 }}</div>
+        <div class="subtitle">Approved products only</div>
+    </div>
+</div>
+
+<!-- PRODUCTS PENDING REVIEW -->
+<div class="section">
+    <h2>📦 Products Pending Review ({{ pending_products }})</h2>
+    {% if pending_products_list %}
+        <table class="moderation-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Artisan</th>
+                    <th>Price</th>
+                    <th>Submitted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in pending_products_list %}
+                <tr>
+                    <td>
+                        <div class="product-name">{{ product.name }}</div>
+                        <div class="artisan-name">{{ product.description|truncatewords:12 }}</div>
+                    </td>
+                    <td>{{ product.artisan.email }}</td>
+                    <td>₹{{ product.price }}</td>
+                    <td>{{ product.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <div class="moderation-actions">
+                            <form class="action-form" method="post" action="{% url 'approve_product' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-approve">Approve</button>
+                            </form>
+                            <form class="action-form" method="post" action="{% url 'reject_product' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-reject">Reject</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <p>✅ All products have been reviewed!</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- TOP ARTISANS -->
+<div class="section">
+    <h2>⭐ Top Artisans by Product Count</h2>
+    {% if top_artisans %}
+        <ul class="artisan-list">
+            {% for artisan in top_artisans %}
+            <li class="artisan-item">
+                <div class="artisan-email">{{ artisan.email }}</div>
+                <div class="artisan-stats">
+                    {{ artisan.product_count }} product{% if artisan.product_count != 1 %}s{% endif %} 
+                    ({{ artisan.approved_count }} approved)
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <p>No artisans with products yet.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- ACTION BUTTONS -->
+<div class="action-buttons">
+    <a href="{% url 'product_list' %}" class="btn btn-success">
+        🛍️ View Marketplace
+    </a>
+</div>
+
+{% endblock %}

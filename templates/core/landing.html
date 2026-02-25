@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Kalasetu - Home{% endblock %}
+
+{% block content %}
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap");
+
+    .landing {
+        font-family: "Source Sans 3", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .hero {
+        position: relative;
+        padding: 70px 30px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #ffe7c7 0%, #f9c6a7 35%, #f4b5d0 70%, #c3d7ff 100%);
+        overflow: hidden;
+        text-align: center;
+        color: #1f2d3d;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .hero-title {
+        font-family: "Playfair Display", "Georgia", serif;
+        font-size: 48px;
+        margin: 0 0 14px 0;
+        letter-spacing: 0.5px;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+        max-width: 760px;
+        margin: 0 auto 24px auto;
+        color: #394a59;
+        line-height: 1.6;
+    }
+
+    .hero-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 8px;
+        background: #2d6cdf;
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 6px 16px rgba(45, 108, 223, 0.25);
+    }
+
+    .btn-primary:hover {
+        background: #2458b5;
+    }
+
+    .section {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 26px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .section-title {
+        font-family: "Playfair Display", "Georgia", serif;
+        font-size: 28px;
+        margin: 0 0 12px 0;
+        color: #2c3e50;
+        text-align: center;
+    }
+
+    .section-text {
+        color: #5c6b79;
+        line-height: 1.6;
+        text-align: center;
+        max-width: 780px;
+        margin: 0 auto;
+    }
+
+    .card-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: center;
+        margin-top: 16px;
+    }
+
+    .card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 18px;
+        flex: 1 1 220px;
+        min-width: 220px;
+        max-width: 320px;
+        border-top: 4px solid #f29f7d;
+    }
+
+    .card h3 {
+        margin: 0 0 6px 0;
+        color: #2c3e50;
+    }
+
+    .card p {
+        margin: 0;
+        color: #5c6b79;
+    }
+
+    .product-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: center;
+        margin-top: 18px;
+    }
+
+    .product-card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 16px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        flex: 1 1 220px;
+        max-width: 280px;
+    }
+
+    .product-name {
+        margin: 0 0 6px 0;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .product-meta {
+        color: #7f8c8d;
+        font-size: 13px;
+    }
+
+    .product-price {
+        margin-top: 8px;
+        font-weight: 700;
+        color: #27ae60;
+    }
+
+    .contact-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 16px;
+    }
+
+    .contact-field {
+        flex: 1 1 240px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .contact-field label {
+        font-weight: 600;
+        color: #34495e;
+        font-size: 14px;
+    }
+
+    .contact-field input,
+    .contact-field textarea {
+        padding: 10px 12px;
+        border: 1px solid #dfe6e9;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .contact-actions {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 6px;
+    }
+
+    .footer {
+        text-align: center;
+        color: #7f8c8d;
+        font-size: 13px;
+        padding: 16px 0 6px 0;
+    }
+
+    .footer a {
+        color: #2d6cdf;
+        text-decoration: none;
+        margin: 0 6px;
+    }
+
+    @media (max-width: 720px) {
+        .hero-title { font-size: 36px; }
+    }
+</style>
+
+<div class="landing">
+    <section class="hero">
+        <h1 class="hero-title">Preserving Culture. Empowering Artisans.</h1>
+        <p class="hero-subtitle">
+            Kalasetu empowers tribal and rural artisans by bringing heritage craftsmanship to a
+            global audience with authenticity and fair trade at its core.
+        </p>
+        <div class="hero-actions">
+            <a class="btn-primary" href="{% url 'product_list' %}">Explore Marketplace</a>
+        </div>
+    </section>
+
+    <section class="section" id="about">
+        <h2 class="section-title">About Kalasetu</h2>
+        <p class="section-text">
+            Kalasetu is a cultural commerce platform that uplifts artisans while preserving tradition.
+            Each product is reviewed for authenticity, ensuring fair trade, ethical sourcing, and
+            visibility for underserved craft communities.
+        </p>
+    </section>
+
+    <section class="section" id="how-it-works">
+        <h2 class="section-title">How It Works</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>1. Artisan Uploads</h3>
+                <p>Artisans upload their handcrafted products with cultural context.</p>
+            </div>
+            <div class="card" style="border-top-color:#4aa3df;">
+                <h3>2. Authenticity Verified</h3>
+                <p>Cultural consultants validate authenticity and heritage value.</p>
+            </div>
+            <div class="card" style="border-top-color:#8bc98b;">
+                <h3>3. Global Purchase</h3>
+                <p>Buyers discover and purchase verified products worldwide.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="featured">
+        <h2 class="section-title">Featured Products</h2>
+        <p class="section-text">A glimpse of our latest approved artisan creations.</p>
+        <div class="product-grid">
+            {% for product in latest_products %}
+                <div class="product-card">
+                    <h4 class="product-name">{{ product.name }}</h4>
+                    <div class="product-meta">by {{ product.artisan.email }}</div>
+                    <div class="product-meta">{{ product.description|truncatewords:14 }}</div>
+                    <div class="product-price">₹{{ product.price }}</div>
+                </div>
+            {% empty %}
+                <div class="product-card">
+                    <h4 class="product-name">No products yet</h4>
+                    <div class="product-meta">New artisan listings will appear soon.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section" id="contact">
+        <h2 class="section-title">Contact Us</h2>
+        <p class="section-text">Have questions or want to partner with us? Send a message.</p>
+        <form class="contact-form" method="post" action="#">
+            <div class="contact-field">
+                <label for="contact-name">Name</label>
+                <input id="contact-name" type="text" placeholder="Your name">
+            </div>
+            <div class="contact-field">
+                <label for="contact-email">Email</label>
+                <input id="contact-email" type="email" placeholder="you@example.com">
+            </div>
+            <div class="contact-field" style="flex: 1 1 100%;">
+                <label for="contact-message">Message</label>
+                <textarea id="contact-message" rows="4" placeholder="Tell us how we can help"></textarea>
+            </div>
+            <div class="contact-actions">
+                <button class="btn-primary" type="submit">Send Message</button>
+            </div>
+        </form>
+    </section>
+
+    <footer class="footer">
+        <div>© 2026 Kalasetu. All rights reserved.</div>
+        <div>
+            <a href="#about">About</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#featured">Featured</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </footer>
+</div>
+
+{% endblock %}

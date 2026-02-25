@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Successful - Kalasetu{% endblock %}
+
+{% block content %}
+<style>
+    .success-wrap {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 16px auto;
+        border-radius: 50%;
+        background: #eafaf1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+    }
+
+    .success-title {
+        font-size: 28px;
+        color: #2c3e50;
+        margin: 0 0 10px 0;
+    }
+
+    .success-text {
+        font-size: 16px;
+        color: #5f6b7a;
+        margin: 6px 0;
+    }
+
+    .success-card {
+        margin: 20px 0 26px 0;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #eef1f4;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 12px 20px;
+        background: #2980b9;
+        color: #ffffff;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover {
+        background: #1f6391;
+    }
+
+    .help-text {
+        margin-top: 18px;
+        font-size: 13px;
+        color: #95a5a6;
+    }
+</style>
+
+<div class="success-wrap">
+    <div class="success-icon">&#10003;</div>
+    <h1 class="success-title">Payment Successful</h1>
+    <p class="success-text">Your order has been placed successfully.</p>
+    <p class="success-text">Thank you for supporting tribal and rural artisans.</p>
+
+    <div class="success-card">
+        <p class="success-text">We have sent a confirmation to your email.</p>
+        <p class="success-text">You can continue exploring artisan products.</p>
+    </div>
+
+    <a class="btn-primary" href="{% url 'product_list' %}">Continue Shopping</a>
+
+    <div class="help-text">Need help? Reach out via the contact page.</div>
+</div>
+{% endblock %}

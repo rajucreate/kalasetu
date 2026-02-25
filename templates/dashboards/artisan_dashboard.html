@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Artisan Dashboard - Kalasetu{% endblock %}
+
+{% block content %}
+<style>
+    .artisan-wrap {
+        max-width: 1100px;
+        margin: 20px auto;
+    }
+
+    .artisan-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .artisan-title {
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .artisan-subtitle {
+        margin: 6px 0 0 0;
+        color: #7f8c8d;
+    }
+
+    .btn-upload {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        color: white;
+        background: #2980b9;
+    }
+
+    .btn-upload:hover {
+        background: #1f6391;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .stat-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #7f8c8d;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-top: 6px;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        background: #ecf0f1;
+        display: block;
+    }
+
+    .product-body {
+        padding: 14px;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 6px 0;
+    }
+
+    .product-price {
+        font-weight: 700;
+        color: #27ae60;
+        margin: 6px 0;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-approved {
+        background: #eafaf1;
+        color: #1e8449;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #b9770e;
+    }
+
+    .empty-state {
+        padding: 20px;
+        text-align: center;
+        color: #95a5a6;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+</style>
+
+<div class="artisan-wrap">
+    <div class="artisan-header">
+        <div>
+            <h1 class="artisan-title">Artisan Dashboard</h1>
+            <p class="artisan-subtitle">Welcome back, {{ request.user.email }}.</p>
+        </div>
+        <a class="btn-upload" href="{% url 'upload_product' %}">Upload New Product</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Products</div>
+            <div class="stat-value">{{ total_products }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Approved</div>
+            <div class="stat-value">{{ approved_products }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value">{{ pending_products }}</div>
+        </div>
+    </div>
+
+    {% if artisan_products %}
+        <div class="product-grid">
+            {% for product in artisan_products %}
+                <div class="product-card">
+                    {% if product.image %}
+                        <img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="product-image"></div>
+                    {% endif %}
+                    <div class="product-body">
+                        <h4 class="product-name">{{ product.name }}</h4>
+                        <div class="product-price">₹{{ product.price }}</div>
+                        {% if product.is_approved %}
+                            <span class="status-badge status-approved">Approved</span>
+                        {% else %}
+                            <span class="status-badge status-pending">Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">No products yet. Upload your first product.</div>
+    {% endif %}
+</div>
+{% endblock %}

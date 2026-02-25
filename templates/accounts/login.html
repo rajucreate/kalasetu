@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kalasetu Login</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f6e6cc 0%, #f5d6d0 45%, #dfe7ff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .login-title {
+            margin: 0 0 6px 0;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            margin: 0 0 18px 0;
+            color: #7f8c8d;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 12px 0;
+        }
+
+        .messages li {
+            padding: 10px 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .messages .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .messages .warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        form p {
+            margin-bottom: 12px;
+        }
+
+        form input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        form input:focus {
+            border-color: #2d6cdf;
+            box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.12);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #2d6cdf;
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            background: #2458b5;
+        }
+
+        .login-footer {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2 class="login-title">Welcome Back</h2>
+        <p class="login-subtitle">Login to continue your Kalasetu journey.</p>
+
+        <!-- Display Django messages -->
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <div class="login-footer">Secure access for artisans, buyers, and consultants.</div>
+    </div>
+</body>
+</html>

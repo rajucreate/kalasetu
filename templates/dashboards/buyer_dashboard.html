@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Buyer Dashboard - Kalasetu{% endblock %}
+
+{% block content %}
+<style>
+    .buyer-wrap {
+        max-width: 1100px;
+        margin: 20px auto;
+    }
+
+    .buyer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .buyer-title {
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .buyer-subtitle {
+        margin: 6px 0 0 0;
+        color: #7f8c8d;
+    }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .card-box {
+        background: white;
+        padding: 18px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .card-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #7f8c8d;
+        letter-spacing: 0.5px;
+    }
+
+    .card-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-top: 6px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-link {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        color: white;
+        background: #2980b9;
+    }
+
+    .btn-link.secondary {
+        background: #27ae60;
+    }
+
+    .btn-link:hover {
+        background: #1f6391;
+    }
+
+    .btn-link.secondary:hover {
+        background: #229954;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .product-body {
+        padding: 14px;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 6px 0;
+    }
+
+    .product-meta {
+        color: #7f8c8d;
+        font-size: 13px;
+    }
+
+    .product-price {
+        margin-top: 10px;
+        font-weight: 700;
+        color: #27ae60;
+    }
+
+    .empty-state {
+        padding: 20px;
+        text-align: center;
+        color: #95a5a6;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+</style>
+
+<div class="buyer-wrap">
+    <div class="buyer-header">
+        <div>
+            <h1 class="buyer-title">Buyer Dashboard</h1>
+            <p class="buyer-subtitle">Welcome back, {{ request.user.email }}.</p>
+        </div>
+        <div class="actions">
+            <a class="btn-link" href="{% url 'product_list' %}">Go to Marketplace</a>
+            <a class="btn-link secondary" href="{% url 'view_cart' %}">View Cart</a>
+        </div>
+    </div>
+
+    <div class="card-grid">
+        <div class="card-box">
+            <div class="card-label">Cart Items</div>
+            <div class="card-value">{{ cart_item_count }}</div>
+        </div>
+    </div>
+
+    <div class="card-box" style="margin-bottom: 16px;">
+        <h3 style="margin: 0 0 12px 0; color: #2c3e50;">Latest Approved Products</h3>
+        {% if latest_products %}
+            <div class="product-grid">
+                {% for product in latest_products %}
+                    <div class="product-card">
+                        <div class="product-body">
+                            <h4 class="product-name">{{ product.name }}</h4>
+                            <div class="product-meta">by {{ product.artisan.email }}</div>
+                            <div class="product-meta">{{ product.description|truncatewords:12 }}</div>
+                            <div class="product-price">₹{{ product.price }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">No approved products yet. Check back soon.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

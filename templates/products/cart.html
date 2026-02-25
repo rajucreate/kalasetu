@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Your Cart - Kalasetu{% endblock %}
+
+{% block content %}
+
+<h1 style="text-align:center; margin-bottom:40px;">Your Cart</h1>
+
+{% if products %}
+    <div class="card" style="max-width:800px; margin:auto;">
+
+        <table style="width:100%; border-collapse:collapse;">
+            <tr style="background-color:#f0f0f0;">
+                <th style="padding:10px; text-align:left;">Product</th>
+                <th style="padding:10px;">Price</th>
+                <th style="padding:10px;">Quantity</th>
+                <th style="padding:10px;">Subtotal</th>
+            </tr>
+
+            {% for product in products %}
+            <tr>
+                <td style="padding:10px;">{{ product.name }}</td>
+                <td style="padding:10px; text-align:center;">₹{{ product.price }}</td>
+                <td style="padding:10px; text-align:center;">{{ product.quantity }}</td>
+                <td style="padding:10px; text-align:center;">₹{{ product.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <hr style="margin:20px 0;">
+
+        <h3 style="text-align:right;">Total: ₹{{ total }}</h3>
+
+        <div style="text-align:right; margin-top:20px;">
+            <a href="{% url 'checkout' %}">
+                <button>Proceed to Checkout</button>
+            </a>
+        </div>
+
+    </div>
+
+{% else %}
+    <div class="card" style="max-width:500px; margin:auto; text-align:center;">
+        <p>Your cart is empty.</p>
+        <br>
+        <a href="{% url 'product_list' %}">
+            <button>Continue Shopping</button>
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}
