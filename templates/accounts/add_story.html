@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Add Story - Kalasetu{% endblock %}
+
+{% block content %}
+<style>
+    .story-form-wrap {
+        max-width: 720px;
+        margin: 20px auto;
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .story-form-wrap h1 {
+        margin: 0 0 6px 0;
+        color: #2c3e50;
+    }
+
+    .story-form-wrap p {
+        margin: 0 0 20px 0;
+        color: #7f8c8d;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+    }
+
+    input[type="text"],
+    textarea,
+    input[type="file"] {
+        border: 1px solid #dfe6e9;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 140px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .btn-outline {
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: 1px solid #2d6cdf;
+        color: #2d6cdf;
+        background: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .btn-outline:hover {
+        background: #edf3ff;
+    }
+
+    .btn-primary {
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: none;
+        background: #2d6cdf;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background: #2458b5;
+    }
+
+    .errorlist {
+        margin: 6px 0 0 0;
+        padding-left: 18px;
+        color: #c0392b;
+        font-size: 13px;
+    }
+</style>
+
+<div class="story-form-wrap">
+    <h1>Add a Cultural Story</h1>
+    <p>Share the heritage behind your craft and inspire cultural appreciation.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_title">Title</label>
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+        <div class="form-group">
+            <label for="id_content">Story</label>
+            {{ form.content }}
+            {{ form.content.errors }}
+        </div>
+        <div class="form-group">
+            <label for="id_image">Image (optional)</label>
+            {{ form.image }}
+            {{ form.image.errors }}
+        </div>
+        <div class="form-actions">
+            <a class="btn-outline" href="{% url 'artisan_dashboard' %}">Cancel</a>
+            <button class="btn-primary" type="submit">Publish Story</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

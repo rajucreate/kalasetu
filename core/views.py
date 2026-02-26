@@ -7,9 +7,9 @@ from django.views.decorators.http import require_POST
 from datetime import timedelta
 from functools import wraps
 from products.models import Product
-from accounts.models import User, Role
+from accounts.models import User, Role, ArtisanStory
 
-
+ 
 def landing_page(request):
     latest_products = Product.objects.filter(
         is_approved=True
@@ -159,12 +159,17 @@ def artisan_dashboard(request):
         artisan=request.user
     ).order_by("-created_at")
 
+    stories = ArtisanStory.objects.filter(
+        artisan=request.user
+    ).order_by("-created_at")
+
     total_products = artisan_products.count()
     approved_products = artisan_products.filter(is_approved=True).count()
     pending_products = artisan_products.filter(is_approved=False).count()
 
     context = {
         "artisan_products": artisan_products,
+        "stories": stories,
         "total_products": total_products,
         "approved_products": approved_products,
         "pending_products": pending_products,
@@ -192,4 +197,64 @@ def buyer_dashboard(request):
 
 @role_required(Role.CONSULTANT)
 def consultant_dashboard(request):
-    return render(request, "dashboards/consultant_dashboard.html")
+    reviewed_count = Product.objects.filter(
+        verification_status__in=[
+            Product.VerificationStatus.VERIFIED,
+            Product.VerificationStatus.REJECTED,
+        ]
+    ).count()
+    verified_count = Product.objects.filter(
+        verification_status=Product.VerificationStatus.VERIFIED
+    ).count()
+    rejected_count = Product.objects.filter(
+        verification_status=Product.VerificationStatus.REJECTED
+    ).count()
+
+    pending_products = Product.objects.filter(
+        is_approved=True,
+        verification_status=Product.VerificationStatus.PENDING
+    ).select_related("artisan").order_by("-created_at")
+
+    context = {
+        "reviewed_count": reviewed_count,
+        "verified_count": verified_count,
+        "rejected_count": rejected_count,
+        "pending_count": pending_products.count(),
+        "pending_products": pending_products,
+    }
+
+    return render(request, "core/consultant_dashboard.html", context)
+
+
+@role_required(Role.CONSULTANT)
+@require_POST
+def verify_product(request, pk):
+    product = get_object_or_404(Product, pk=pk, is_approved=True)
+    action = request.POST.get("action")
+    note = (request.POST.get("verification_note") or "").strip()
+
+    if action not in {"verify", "reject"}:
+        messages.error(request, "Invalid verification action.")
+        return redirect("consultant_dashboard")
+
+    if action == "verify":
+        product.verification_status = Product.VerificationStatus.VERIFIED
+        product.is_verified = True
+        messages.success(request, f"Verified product: {product.name}")
+    else:
+        product.verification_status = Product.VerificationStatus.REJECTED
+        product.is_verified = False
+        messages.warning(request, f"Rejected product: {product.name}")
+
+    product.verification_note = note
+    product.verified_by = request.user
+    product.verified_at = timezone.now()
+    product.save(update_fields=[
+        "verification_status",
+        "is_verified",
+        "verification_note",
+        "verified_by",
+        "verified_at",
+    ])
+
+    return redirect("consultant_dashboard")

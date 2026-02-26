@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block title %}Artisan Profile - Kalasetu{% endblock %}
+
+{% block content %}
+<style>
+    .profile-page {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+    }
+
+    .hero-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #eef2f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        color: #7b8794;
+        border: 4px solid #ffffff;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-details h1 {
+        margin: 0 0 6px 0;
+        font-size: 28px;
+        color: #1f2933;
+    }
+
+    .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 18px;
+        color: #6b7b88;
+        font-size: 14px;
+    }
+
+    .hero-pill {
+        background: #edf3ff;
+        color: #2d6cdf;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .section-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        margin: 0 0 12px 0;
+        font-size: 20px;
+        color: #1f2933;
+    }
+
+    .section-text {
+        margin: 0;
+        color: #5f6c7b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .impact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+    }
+
+    .impact-card {
+        background: #f8f9fb;
+        border-radius: 12px;
+        padding: 14px;
+    }
+
+    .impact-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #7b8794;
+        margin-bottom: 6px;
+    }
+
+    .impact-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1f2933;
+        margin: 0;
+    }
+
+    .impact-bar {
+        margin-top: 16px;
+        background: #edf2f7;
+        border-radius: 999px;
+        height: 10px;
+        overflow: hidden;
+    }
+
+    .impact-fill {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #2d6cdf, #64b5f6);
+        border-radius: 999px;
+        transition: width 1.6s ease;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+    }
+
+    .story-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+    }
+
+    .story-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .story-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+    }
+
+    .story-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        background: #eef2f5;
+    }
+
+    .story-body {
+        padding: 12px 14px 16px;
+    }
+
+    .story-body h3 {
+        margin: 0 0 6px 0;
+        font-size: 16px;
+        color: #1f2933;
+    }
+
+    .story-meta {
+        margin-bottom: 8px;
+        font-size: 12px;
+        color: #8b98a4;
+    }
+
+    .story-body p {
+        margin: 0;
+        color: #6b7b88;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .product-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        background: #eef2f5;
+    }
+
+    .product-body {
+        padding: 12px 14px 16px;
+    }
+
+    .product-body h3 {
+        margin: 0 0 6px 0;
+        font-size: 16px;
+        color: #1f2933;
+    }
+
+    .product-body p {
+        margin: 0 0 8px 0;
+        color: #6b7b88;
+        font-size: 13px;
+    }
+
+    .product-body a {
+        color: #2d6cdf;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .product-body a:hover {
+        text-decoration: underline;
+    }
+
+    .fade-in {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 720px) {
+        .hero-card {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .hero-meta {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="profile-page">
+    <section class="hero-card fade-in">
+        <div class="avatar">
+            {% if artisan.profile_image %}
+                <img src="{{ artisan.profile_image.url }}" alt="{{ artisan.email }}">
+            {% else %}
+                {{ artisan.email|first|upper }}
+            {% endif %}
+        </div>
+        <div class="hero-details">
+            <h1>{{ artisan.email }}</h1>
+            <div class="hero-meta">
+                <span class="hero-pill">Artisan</span>
+                <span>Region: {{ artisan.region|default:"Not specified" }}</span>
+                <span>Experience: {{ artisan.experience_years }} years</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-card fade-in">
+        <h2 class="section-title">About the Artisan</h2>
+        <p class="section-text">
+            {{ artisan.bio|default:"This artisan has not shared their story yet." }}
+        </p>
+    </section>
+
+    <section class="section-card fade-in">
+        <h2 class="section-title">Cultural Impact</h2>
+        <div class="impact-grid">
+            <div class="impact-card">
+                <div class="impact-label">Total Products</div>
+                <p class="impact-value">{{ total_products }}</p>
+            </div>
+            <div class="impact-card">
+                <div class="impact-label">Verified Products</div>
+                <p class="impact-value">{{ verified_products }}</p>
+            </div>
+            <div class="impact-card">
+                <div class="impact-label">Impact Score</div>
+                <p class="impact-value">{{ impact_score }}</p>
+            </div>
+        </div>
+        <div class="impact-bar" aria-label="Impact score">
+            <div class="impact-fill" data-impact="{{ impact_score }}"></div>
+        </div>
+    </section>
+
+    <section class="section-card fade-in">
+        <h2 class="section-title">Cultural Stories</h2>
+        {% if stories %}
+            <div class="story-grid">
+                {% for story in stories %}
+                    <article class="story-card fade-in">
+                        {% if story.image %}
+                            <img src="{{ story.image.url }}" alt="{{ story.title }}">
+                        {% else %}
+                            <div style="height: 160px; background: #eef2f5;"></div>
+                        {% endif %}
+                        <div class="story-body">
+                            <h3>{{ story.title }}</h3>
+                            <div class="story-meta">{{ story.created_at|date:"M d, Y" }}</div>
+                            <p>{{ story.content|truncatewords:28 }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="section-text">No stories shared yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="section-card fade-in">
+        <h2 class="section-title">Products by {{ artisan.email }}</h2>
+        {% if products %}
+            <div class="products-grid">
+                {% for product in products %}
+                    <div class="product-card">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <div style="height: 160px; background: #eef2f5;"></div>
+                        {% endif %}
+                        <div class="product-body">
+                            <h3>{{ product.name }}</h3>
+                            <p>{{ product.description|truncatewords:16 }}</p>
+                            <a href="{% url 'product_detail' product.id %}">View Product</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="section-text">No approved products yet.</p>
+        {% endif %}
+    </section>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const fadeTargets = document.querySelectorAll(".fade-in");
+        const impactFill = document.querySelector(".impact-fill");
+
+        // Fade-in animation for sections on scroll.
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2 });
+
+        fadeTargets.forEach((target) => observer.observe(target));
+
+        // Animate impact meter when the impact section enters view.
+        if (impactFill) {
+            const impactObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const impactValue = Math.min(
+                            parseInt(impactFill.dataset.impact || "0", 10),
+                            100
+                        );
+                        impactFill.style.width = `${impactValue}%`;
+                        impactObserver.disconnect();
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            impactObserver.observe(impactFill.parentElement);
+        }
+    });
+</script>
+{% endblock %}

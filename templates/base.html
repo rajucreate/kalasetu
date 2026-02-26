@@ -8,6 +8,7 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            scroll-behavior: smooth;
         }
 
         nav {
@@ -23,10 +24,12 @@
             text-decoration: none;
             margin-right: 15px;
             font-weight: bold;
+            transition: color 0.3s ease;
         }
 
         nav a:hover {
-            text-decoration: underline;
+            color: #3498db;
+            text-decoration: none;
         }
 
         .container {
@@ -39,10 +42,43 @@
             background-color: #2980b9;
             color: white;
             cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            overflow: hidden;
         }
 
         button:hover {
             background-color: #1f6391;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Ripple effect container */
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        button.ripple::before {
+            animation: ripple-animation 0.6s ease-out;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
         }
 
         .card {
@@ -50,6 +86,18 @@
             padding: 15px;
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Product card hover elevation */
+        .product-card {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
         }
 
         /* Cart badge styling */
@@ -70,6 +118,24 @@
             font-weight: bold;
             min-width: 18px;
             text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        /* Badge pulse animation when updated */
+        .cart-badge.pulse {
+            animation: pulse-animation 0.6s ease-out;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.25);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         /* User info styling */
@@ -95,6 +161,7 @@
             font-weight: 600;
             text-decoration: none;
             display: inline-block;
+            transition: background-color 0.3s ease;
         }
 
         .btn-logout:hover {
@@ -113,6 +180,7 @@
             font-weight: 600;
             text-decoration: none;
             display: inline-block;
+            transition: background-color 0.3s ease;
         }
 
         .btn-login:hover {
@@ -132,6 +200,7 @@
             margin: 10px 0;
             border-radius: 4px;
             font-size: 14px;
+            animation: slideInDown 0.4s ease-out;
         }
 
         .messages .success {
@@ -156,6 +225,260 @@
             background-color: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
+        }
+
+        /* Fade in animation for viewport entrance */
+        .fade-in-viewport {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-viewport.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Animations keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes spinLoader {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Loading spinner overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            animation: fadeIn 0.3s ease-out;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spinLoader 1s linear infinite;
+        }
+
+        /* Toast notification styling */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .toast {
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+            min-width: 300px;
+            animation: slideInRight 0.4s ease-out;
+            border-left: 4px solid #27ae60;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .toast.success {
+            border-left-color: #27ae60;
+        }
+
+        .toast.error {
+            border-left-color: #e74c3c;
+        }
+
+        .toast.info {
+            border-left-color: #3498db;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+
+        .toast.hide {
+            animation: slideOutRight 0.4s ease-out forwards;
+        }
+
+        /* Modal styling */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9998;
+            animation: fadeIn 0.3s ease-out;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .modal p {
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button.confirm {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .modal-button.confirm:hover {
+            background-color: #229954;
+            transform: translateY(-2px);
+        }
+
+        .modal-button.cancel {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        /* Image preview styling */
+        .image-preview-container {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* Stat card counter styling */
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Add to cart button styling for toast trigger */
+        .add-to-cart-btn {
+            position: relative;
         }
     </style>
 </head>
@@ -203,6 +526,326 @@
         {% block content %}
         {% endblock %}
     </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalContent">
+            <h2 id="modalTitle">Confirm Action</h2>
+            <p id="modalMessage">Are you sure?</p>
+            <div class="modal-buttons">
+                <button class="modal-button cancel" id="modalCancel">Cancel</button>
+                <button class="modal-button confirm" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // UI INTERACTIVITY & ANIMATIONS MANAGER
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ========================================
+            // 1. SMOOTH SCROLLING FOR ANCHOR LINKS
+            // ========================================
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#' && document.querySelector(href)) {
+                        e.preventDefault();
+                        const element = document.querySelector(href);
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            // ========================================
+            // 2. INTERSECTION OBSERVER - FADE IN ON VIEWPORT
+            // ========================================
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Optional: Stop observing after animation
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Apply fade-in animation to cards and sections
+            document.querySelectorAll('.card, .product-card, .stat-card, .section').forEach(element => {
+                element.classList.add('fade-in-viewport');
+                observer.observe(element);
+            });
+
+            // ========================================
+            // 3. ANIMATED NUMBER COUNTERS
+            // ========================================
+            const animateCounter = (element, target, duration = 1000) => {
+                let current = 0;
+                const isFloat = target.includes('.');
+                const decimals = isFloat ? 2 : 0;
+                const increment = target / (duration / 16);
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        element.textContent = new Intl.NumberFormat('en-IN').format(
+                            isFloat ? parseFloat(target).toFixed(decimals) : parseInt(target)
+                        );
+                        clearInterval(timer);
+                    } else {
+                        element.textContent = new Intl.NumberFormat('en-IN').format(
+                            isFloat ? parseFloat(current).toFixed(decimals) : Math.floor(current)
+                        );
+                    }
+                }, 16);
+            };
+
+            // Observer for counter animation trigger
+            const counterObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+                        const numberElement = entry.target.querySelector('.number');
+                        if (numberElement && numberElement.textContent) {
+                            const target = parseFloat(numberElement.textContent.replace(/[^0-9.-]/g, ''));
+                            if (target > 0) {
+                                numberElement.classList.add('counted');
+                                animateCounter(numberElement, target);
+                                counterObserver.unobserve(entry.target);
+                            }
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            document.querySelectorAll('.stat-card').forEach(card => {
+                counterObserver.observe(card);
+            });
+
+            // ========================================
+            // 4. BUTTON RIPPLE EFFECT
+            // ========================================
+            document.querySelectorAll('button, .modal-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    const ripple = document.createElement('span');
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+
+                    // Add ripple class for animation
+                    this.classList.add('ripple');
+                    
+                    // Remove ripple class after animation
+                    setTimeout(() => {
+                        this.classList.remove('ripple');
+                    }, 600);
+                });
+            });
+
+            // ========================================
+            // 5. TOAST NOTIFICATION SYSTEM
+            // ========================================
+            window.showToast = function(message, type = 'success', duration = 4000) {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 400);
+                }, duration);
+            };
+
+            // Add to Cart Toast Trigger
+            document.querySelectorAll('.add-to-cart-btn, button[name="add_to_cart"]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // Only show toast if form submission was successful (no errors)
+                    const form = this.closest('form');
+                    if (!form) {
+                        window.showToast('✓ Item added to cart successfully!', 'success');
+                        // Trigger cart badge pulse
+                        const badge = document.querySelector('.cart-badge');
+                        if (badge) {
+                            badge.classList.remove('pulse');
+                            void badge.offsetWidth; // Trigger reflow
+                            badge.classList.add('pulse');
+                        }
+                    }
+                });
+            });
+
+            // ========================================
+            // 6. LOADING SPINNER ON FORM SUBMIT
+            // ========================================
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    // Don't show spinner for certain forms (like search/filter)
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn && !submitBtn.classList.contains('no-spinner')) {
+                        document.getElementById('loadingOverlay').classList.add('active');
+                    }
+                });
+            });
+
+            // ========================================
+            // 7. IMAGE PREVIEW BEFORE UPLOAD
+            // ========================================
+            document.querySelectorAll('input[type="file"][accept*="image"]').forEach(input => {
+                input.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            // Remove existing preview if any
+                            const existingPreview = input.parentElement.querySelector('.image-preview');
+                            if (existingPreview) {
+                                existingPreview.remove();
+                            }
+
+                            // Create preview container if it doesn't exist
+                            let previewContainer = input.parentElement.querySelector('.image-preview-container');
+                            if (!previewContainer) {
+                                previewContainer = document.createElement('div');
+                                previewContainer.className = 'image-preview-container';
+                                input.parentElement.appendChild(previewContainer);
+                            }
+
+                            // Create and add preview image
+                            const preview = document.createElement('img');
+                            preview.className = 'image-preview';
+                            preview.src = event.target.result;
+                            previewContainer.appendChild(preview);
+
+                            // Show file name
+                            const fileInfo = document.createElement('p');
+                            fileInfo.style.marginTop = '10px';
+                            fileInfo.style.fontSize = '14px';
+                            fileInfo.style.color = '#7f8c8d';
+                            fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                            previewContainer.appendChild(fileInfo);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+
+            // ========================================
+            // 8. ADMIN APPROVAL CONFIRMATION MODAL
+            // ========================================
+            window.showConfirmModal = function(title, message, onConfirm, onCancel) {
+                const overlay = document.getElementById('modalOverlay');
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalMessage').textContent = message;
+
+                const confirmBtn = document.getElementById('modalConfirm');
+                const cancelBtn = document.getElementById('modalCancel');
+
+                // Store the callback
+                confirmBtn.onclick = function() {
+                    overlay.classList.remove('active');
+                    if (onConfirm) onConfirm();
+                };
+
+                cancelBtn.onclick = function() {
+                    overlay.classList.remove('active');
+                    if (onCancel) onCancel();
+                };
+
+                // Close on overlay click
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                        if (onCancel) onCancel();
+                    }
+                });
+
+                overlay.classList.add('active');
+            };
+
+            // Attach to approval buttons (customize selector as needed)
+            document.querySelectorAll('button[data-action="approve"]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productName = this.getAttribute('data-product') || 'this item';
+                    window.showConfirmModal(
+                        'Approve Product',
+                        `Are you sure you want to approve "${productName}"?`,
+                        () => {
+                            // Execute the original action
+                            this.closest('form').submit();
+                        }
+                    );
+                });
+            });
+
+            // ========================================
+            // 9. PRODUCT CARD HOVER ELEVATION
+            // ========================================
+            // Already handled by CSS transitions
+            // This comment serves as documentation
+
+            // ========================================
+            // 10. CART BADGE PULSE ANIMATION
+            // ========================================
+            // Triggered by "Add to Cart" button click (see feature 5)
+            // Can also be called manually:
+            window.pulseBadge = function() {
+                const badge = document.querySelector('.cart-badge');
+                if (badge) {
+                    badge.classList.remove('pulse');
+                    void badge.offsetWidth; // Trigger reflow to restart animation
+                    badge.classList.add('pulse');
+                }
+            };
+
+            // ========================================
+            // UTILITY: Close loading overlay on page load
+            // ========================================
+            window.addEventListener('load', function() {
+                // Give forms a chance to be processed by Django
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').classList.remove('active');
+                }, 500);
+            });
+
+            // ========================================
+            // ACCESSIBILITY: Keyboard support for modals
+            // ========================================
+            document.addEventListener('keydown', function(e) {
+                const overlay = document.getElementById('modalOverlay');
+                if (overlay.classList.contains('active')) {
+                    if (e.key === 'Escape') {
+                        overlay.classList.remove('active');
+                    } else if (e.key === 'Enter') {
+                        document.getElementById('modalConfirm').click();
+                    }
+                }
+            });
+
+        });
+    </script>
 
 </body>
 </html>

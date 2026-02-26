@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
-from .forms import LoginForm, RegisterForm
-from .models import Role
+from .forms import LoginForm, RegisterForm, ArtisanStoryForm
+from .models import Role, User, ArtisanStory
+from core.views import role_required
+from products.models import Product
 
 
 @require_http_methods(["GET", "POST"])
@@ -124,3 +126,52 @@ def register_view(request):
         form = RegisterForm()
 
     return render(request, "accounts/register.html", {"form": form})
+
+
+def artisan_profile(request, pk):
+    artisan = get_object_or_404(User, pk=pk, role=Role.ARTISAN)
+    artisan_products = Product.objects.filter(
+        artisan=artisan,
+        is_approved=True
+    ).order_by("-created_at")
+
+    stories = ArtisanStory.objects.filter(
+        artisan=artisan
+    ).order_by("-created_at")
+
+    verified_products = artisan_products.filter(
+        verification_status=Product.VerificationStatus.VERIFIED
+    ).count()
+    total_products = artisan_products.count()
+
+    # Basic impact metric for public display.
+    impact_score = verified_products * 10
+
+    context = {
+        "artisan": artisan,
+        "products": artisan_products,
+        "stories": stories,
+        "total_products": total_products,
+        "verified_products": verified_products,
+        "impact_score": impact_score,
+    }
+
+    return render(request, "accounts/artisan_profile.html", context)
+
+
+@role_required(Role.ARTISAN)
+def add_story(request):
+    if request.method == "POST":
+        form = ArtisanStoryForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Attach the story to the logged-in artisan.
+            story = form.save(commit=False)
+            story.artisan = request.user
+            story.save()
+            messages.success(request, "Story added to your public profile.")
+            return redirect("artisan_dashboard")
+        messages.error(request, "Please fix the errors below.")
+    else:
+        form = ArtisanStoryForm()
+
+    return render(request, "accounts/add_story.html", {"form": form})

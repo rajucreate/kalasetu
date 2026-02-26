@@ -20,6 +20,31 @@
         margin: 0 auto;
     }
 
+    .marketplace-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin: 0 0 12px 0;
+    }
+
+    .dashboard-link {
+        padding: 9px 14px;
+        border-radius: 8px;
+        border: 1px solid #2d6cdf;
+        color: #2d6cdf;
+        background: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        box-shadow: 0 4px 10px rgba(45, 108, 223, 0.12);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .dashboard-link:hover {
+        background: #edf3ff;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(45, 108, 223, 0.16);
+    }
+
     .marketplace-tools {
         display: flex;
         flex-wrap: wrap;
@@ -53,6 +78,7 @@
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         display: flex;
         flex-direction: column;
+        position: relative;
     }
 
     .product-card:hover {
@@ -66,6 +92,31 @@
         max-height: 180px;
         object-fit: cover;
         background: #f0f3f6;
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .badge-verified {
+        background: #e7f6ee;
+        color: #1e7a45;
+        border: 1px solid #bfe6cf;
+    }
+
+    .badge-pending {
+        background: #fff3d9;
+        color: #8a5a00;
+        border: 1px solid #f2d2a1;
     }
 
     .product-body {
@@ -93,6 +144,16 @@
     .product-meta {
         color: #8b98a4;
         font-size: 12px;
+    }
+
+    .product-meta a {
+        color: #2d6cdf;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .product-meta a:hover {
+        text-decoration: underline;
     }
 
     .product-price {
@@ -173,6 +234,20 @@
     </p>
 </div>
 
+{% if user.is_authenticated %}
+    <div class="marketplace-actions">
+        {% if user.role == "ADMIN" %}
+            <a class="dashboard-link" href="{% url 'admin_dashboard' %}">Back to Dashboard</a>
+        {% elif user.role == "ARTISAN" %}
+            <a class="dashboard-link" href="{% url 'artisan_dashboard' %}">Back to Dashboard</a>
+        {% elif user.role == "BUYER" %}
+            <a class="dashboard-link" href="{% url 'buyer_dashboard' %}">Back to Dashboard</a>
+        {% elif user.role == "CONSULTANT" %}
+            <a class="dashboard-link" href="{% url 'consultant_dashboard' %}">Back to Dashboard</a>
+        {% endif %}
+    </div>
+{% endif %}
+
 <div class="marketplace-tools">
     <input class="tool-input" type="text" placeholder="Search products" aria-label="Search products">
     <select class="tool-select" aria-label="Filter">
@@ -198,14 +273,25 @@
                     <div class="product-image"></div>
                 {% endif %}
 
+                {% if product.verification_status == "VERIFIED" %}
+                    <div class="product-badge badge-verified">Authenticity Verified</div>
+                {% elif product.verification_status == "PENDING" %}
+                    <div class="product-badge badge-pending">Under Cultural Review</div>
+                {% endif %}
+
                 <div class="product-body">
                     <h3 class="product-name">{{ product.name }}</h3>
                     <p class="product-desc">{{ product.description|truncatewords:16 }}</p>
-                    <div class="product-meta">Artisan: {{ product.artisan.email }}</div>
+                    <div class="product-meta">
+                        Artisan:
+                        <a href="{% url 'artisan_profile' product.artisan.id %}">
+                            {{ product.artisan.email }}
+                        </a>
+                    </div>
                     <div class="product-price">₹{{ product.price }}</div>
 
                     <div class="product-actions">
-                        <a class="btn-outline" href="#">View Details</a>
+                        <a class="btn-outline" href="{% url 'product_detail' product.id %}">View Details</a>
                         <form method="post" action="{% url 'add_to_cart' product.id %}">
                             {% csrf_token %}
                             <button class="btn-primary" type="submit">Add to Cart</button>

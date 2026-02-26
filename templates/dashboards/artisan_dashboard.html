@@ -18,6 +18,12 @@
         gap: 10px;
     }
 
+    .action-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
     .artisan-title {
         margin: 0;
         color: #2c3e50;
@@ -40,6 +46,21 @@
 
     .btn-upload:hover {
         background: #1f6391;
+    }
+
+    .btn-secondary {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        color: #2d6cdf;
+        background: #ffffff;
+        border: 1px solid #2d6cdf;
+    }
+
+    .btn-secondary:hover {
+        background: #edf3ff;
     }
 
     .stats-grid {
@@ -133,6 +154,60 @@
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
+
+    .story-section {
+        margin-top: 28px;
+    }
+
+    .story-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .story-card {
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .story-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+    }
+
+    .story-image {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        background: #ecf0f1;
+    }
+
+    .story-body {
+        padding: 14px;
+    }
+
+    .story-title {
+        margin: 0 0 6px 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .story-date {
+        font-size: 12px;
+        color: #8b98a4;
+        margin-bottom: 8px;
+    }
+
+    .story-content {
+        font-size: 13px;
+        color: #6b7b88;
+        line-height: 1.5;
+        margin: 0;
+    }
 </style>
 
 <div class="artisan-wrap">
@@ -141,7 +216,10 @@
             <h1 class="artisan-title">Artisan Dashboard</h1>
             <p class="artisan-subtitle">Welcome back, {{ request.user.email }}.</p>
         </div>
-        <a class="btn-upload" href="{% url 'upload_product' %}">Upload New Product</a>
+        <div class="action-group">
+            <a class="btn-secondary" href="{% url 'add_story' %}">Add Story</a>
+            <a class="btn-upload" href="{% url 'upload_product' %}">Upload New Product</a>
+        </div>
     </div>
 
     <div class="stats-grid">
@@ -183,5 +261,29 @@
     {% else %}
         <div class="empty-state">No products yet. Upload your first product.</div>
     {% endif %}
+
+    <div class="story-section">
+        <h2 class="artisan-title">Your Stories</h2>
+        {% if stories %}
+            <div class="story-grid">
+                {% for story in stories %}
+                    <div class="story-card">
+                        {% if story.image %}
+                            <img class="story-image" src="{{ story.image.url }}" alt="{{ story.title }}">
+                        {% else %}
+                            <div class="story-image"></div>
+                        {% endif %}
+                        <div class="story-body">
+                            <h3 class="story-title">{{ story.title }}</h3>
+                            <div class="story-date">{{ story.created_at|date:"M d, Y" }}</div>
+                            <p class="story-content">{{ story.content|truncatewords:24 }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">You have not added any stories yet.</div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

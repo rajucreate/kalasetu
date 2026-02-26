@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Consultant Dashboard - Kalasetu{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #7b8794;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 6px;
+    }
+
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .table-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        padding: 16px;
+        overflow-x: auto;
+    }
+
+    .table-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 12px 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        text-align: left;
+        padding: 12px 10px;
+        border-bottom: 1px solid #eef2f5;
+        font-size: 14px;
+    }
+
+    th {
+        color: #5c6b77;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-size: 12px;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-outline {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #2d6cdf;
+        color: #2d6cdf;
+        background: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .btn-outline:hover {
+        background: #edf3ff;
+    }
+
+    .btn-primary {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        background: #2d6cdf;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background: #2458b5;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+        color: #7b8794;
+    }
+
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 50;
+    }
+
+    .modal-backdrop.is-open {
+        display: flex;
+    }
+
+    .modal {
+        background: #ffffff;
+        border-radius: 12px;
+        max-width: 520px;
+        width: 100%;
+        padding: 20px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title {
+        margin: 0 0 6px 0;
+        font-size: 20px;
+        color: #1f2933;
+    }
+
+    .modal-subtitle {
+        margin: 0 0 16px 0;
+        color: #6b7b88;
+        font-size: 14px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+    }
+
+    .form-control {
+        border: 1px solid #dfe6e9;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 90px;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 12px;
+    }
+</style>
+
+<div class="dashboard-wrap">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Reviewed</div>
+            <p class="stat-value">{{ reviewed_count }}</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Verified</div>
+            <p class="stat-value">{{ verified_count }}</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Rejected</div>
+            <p class="stat-value">{{ rejected_count }}</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pending</div>
+            <p class="stat-value">{{ pending_count }}</p>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <h2 class="table-title">Pending Cultural Review</h2>
+        {% if pending_products %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Artisan</th>
+                        <th>Region</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in pending_products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.artisan.email }}</td>
+                            <td>{{ product.region|default:"Not set" }}</td>
+                            <td>
+                                <div class="action-group">
+                                    <a class="btn-outline" href="{% url 'product_detail' product.id %}">View</a>
+                                    <button
+                                        class="btn-primary open-verify"
+                                        type="button"
+                                        data-verify-url="{% url 'verify_product' product.id %}"
+                                        data-product-name="{{ product.name }}"
+                                    >
+                                        Verify
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">No pending products awaiting review.</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal-backdrop" id="verifyModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+        <h3 class="modal-title">Verification Note</h3>
+        <p class="modal-subtitle" id="modalProductName"></p>
+        <form method="post" id="verifyForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="verification_note">Consultant Note</label>
+                <textarea
+                    id="verification_note"
+                    name="verification_note"
+                    class="form-control"
+                    placeholder="Share the cultural authenticity details or reason for rejection."
+                    required
+                ></textarea>
+            </div>
+            <div class="form-group">
+                <label for="action">Decision</label>
+                <select id="action" name="action" class="form-control">
+                    <option value="verify">Verify</option>
+                    <option value="reject">Reject</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" id="closeModal">Cancel</button>
+                <button type="submit" class="btn-primary">Submit Decision</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById("verifyModal");
+    const modalName = document.getElementById("modalProductName");
+    const verifyForm = document.getElementById("verifyForm");
+    const closeModal = document.getElementById("closeModal");
+
+    document.querySelectorAll(".open-verify").forEach((button) => {
+        button.addEventListener("click", () => {
+            const url = button.getAttribute("data-verify-url");
+            const productName = button.getAttribute("data-product-name");
+            verifyForm.setAttribute("action", url);
+            modalName.textContent = `Reviewing: ${productName}`;
+            modal.classList.add("is-open");
+        });
+    });
+
+    closeModal.addEventListener("click", () => {
+        modal.classList.remove("is-open");
+    });
+
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            modal.classList.remove("is-open");
+        }
+    });
+
+    verifyForm.addEventListener("submit", (event) => {
+        const confirmed = window.confirm("Confirm this verification decision?");
+        if (!confirmed) {
+            event.preventDefault();
+        }
+    });
+</script>
+{% endblock %}

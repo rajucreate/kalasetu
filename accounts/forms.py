@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import User, Role
+from .models import User, Role, ArtisanStory
 
 
 class RegisterForm(UserCreationForm):
@@ -24,3 +24,18 @@ class RegisterForm(UserCreationForm):
 
 class LoginForm(AuthenticationForm):
     username = forms.EmailField(label="Email")
+
+
+class ArtisanStoryForm(forms.ModelForm):
+    class Meta:
+        model = ArtisanStory
+        fields = ["title", "content", "image"]
+        widgets = {
+            "title": forms.TextInput(attrs={
+                "placeholder": "Story title",
+            }),
+            "content": forms.Textarea(attrs={
+                "placeholder": "Share the cultural story behind your craft.",
+                "rows": 6,
+            }),
+        }

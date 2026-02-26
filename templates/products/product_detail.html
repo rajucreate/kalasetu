@@ -1,0 +1,853 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Kalasetu{% endblock %}
+
+{% block content %}
+<style>
+    /* ========================================
+       ROOT & GENERAL STYLES
+       ======================================== */
+    :root {
+        --primary-color: #2980b9;
+        --accent-color: #e74c3c;
+        --success-color: #27ae60;
+        --text-dark: #2c3e50;
+        --text-light: #7f8c8d;
+        --border-light: #ecf0f1;
+        --timeline-dot: #3498db;
+        --timeline-line: #bdc3c7;
+    }
+
+    .product-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    /* ========================================
+       1. HERO SECTION
+       ======================================== */
+    .hero-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+        padding: 80px 40px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 500px;
+        height: 500px;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        animation: heroImageZoom 0.8s ease-out;
+    }
+
+    .hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .hero-content h1 {
+        font-size: 48px;
+        line-height: 1.2;
+        color: var(--text-dark);
+        margin: 0;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .hero-content .price-tag {
+        font-size: 36px;
+        font-weight: bold;
+        color: var(--accent-color);
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .hero-content .description {
+        font-size: 16px;
+        color: var(--text-light);
+        line-height: 1.6;
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+
+    .add-to-cart-section {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        animation: fadeInUp 0.8s ease-out 0.8s both;
+    }
+
+    .btn-add-cart {
+        flex: 1;
+        padding: 16px 32px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-add-cart:hover {
+        background-color: #1f6391;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(41, 128, 185, 0.3);
+    }
+
+    .btn-add-cart:active {
+        transform: translateY(0);
+    }
+
+    .btn-add-cart.ripple::before {
+        animation: ripple 0.6s ease-out;
+    }
+
+    @keyframes ripple {
+        to {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+        }
+    }
+
+    .btn-add-cart::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+
+    .btn-wishlist {
+        padding: 16px 32px;
+        background-color: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-wishlist:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+    }
+
+    /* ========================================
+       2. CULTURAL JOURNEY TIMELINE
+       ======================================== */
+    .cultural-journey-section {
+        padding: 100px 40px;
+        background-color: #f8f9fa;
+        position: relative;
+    }
+
+    .section-title {
+        font-size: 40px;
+        color: var(--text-dark);
+        text-align: center;
+        margin-bottom: 60px;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        height: 4px;
+        width: 80px;
+        background: var(--primary-color);
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 2px;
+    }
+
+    /* Vertical Timeline */
+    .timeline {
+        position: relative;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 3px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--timeline-line) 0%, rgba(189, 195, 199, 0.3) 100%);
+    }
+
+    .timeline-item {
+        margin-bottom: 50px;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInTimeline 0.8s ease-out forwards;
+    }
+
+    .timeline-item:nth-child(1) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(2) { animation-delay: 0.4s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.6s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.8s; }
+
+    @keyframes fadeInTimeline {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content {
+        margin-left: 0;
+        margin-right: auto;
+        text-align: right;
+        width: calc(50% - 40px);
+    }
+
+    .timeline-item:nth-child(even) .timeline-content {
+        margin-left: auto;
+        margin-right: 0;
+        text-align: left;
+        width: calc(50% - 40px);
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: white;
+        border: 3px solid var(--timeline-dot);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        z-index: 10;
+    }
+
+    .timeline-content {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-light);
+    }
+
+    .timeline-content:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+
+    .timeline-label {
+        font-size: 13px;
+        text-transform: uppercase;
+        color: var(--primary-color);
+        font-weight: bold;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .timeline-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--text-dark);
+        margin: 8px 0;
+    }
+
+    .timeline-description {
+        font-size: 14px;
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+
+    /* ========================================
+       3. AUTHENTICITY SECTION
+       ======================================== */
+    .authenticity-section {
+        padding: 80px 40px;
+        background: white;
+        text-align: center;
+    }
+
+    .verification-badge {
+        display: inline-block;
+        position: relative;
+        margin: 30px 0;
+    }
+
+    .badge-stamp {
+        width: 120px;
+        height: 120px;
+        border: 3px solid var(--success-color);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        position: relative;
+        transform: rotate(-15deg);
+        animation: stampSpin 2s ease-in-out infinite;
+    }
+
+    @keyframes stampSpin {
+        0%, 100% { transform: rotate(-15deg) scale(1); }
+        50% { transform: rotate(-15deg) scale(1.05); }
+    }
+
+    .badge-stamp-text {
+        font-size: 11px;
+        font-weight: bold;
+        color: var(--success-color);
+        text-transform: uppercase;
+        text-align: center;
+        letter-spacing: 1px;
+        line-height: 1.3;
+    }
+
+    .badge-checkmark {
+        font-size: 40px;
+        color: var(--success-color);
+        margin-top: 5px;
+    }
+
+    .verification-info {
+        margin-top: 20px;
+        font-size: 16px;
+        color: var(--text-light);
+    }
+
+    .verified-by-name {
+        font-weight: bold;
+        color: var(--text-dark);
+    }
+
+    .awaiting-verification {
+        display: inline-block;
+        padding: 15px 30px;
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-size: 14px;
+    }
+
+    /* ========================================
+       4. SOCIAL IMPACT SECTION
+       ======================================== */
+    .social-impact-section {
+        padding: 100px 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .impact-content {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .social-impact-section .section-title {
+        color: white;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .social-impact-section .section-title::after {
+        background: white;
+    }
+
+    .impact-score-container {
+        margin: 60px 0;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .impact-score-label {
+        font-size: 16px;
+        margin-bottom: 15px;
+        opacity: 0.9;
+    }
+
+    .progress-bar-wrapper {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 30px;
+        height: 40px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #00d4ff 0%, #00ff87 100%);
+        border-radius: 30px;
+        width: 0%;
+        transition: width 2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 0 15px rgba(0, 255, 135, 0.6);
+        position: relative;
+    }
+
+    .progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .progress-text {
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+
+    .progress-number {
+        display: inline-block;
+        min-width: 50px;
+    }
+
+    .impact-bullets {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-top: 60px;
+    }
+
+    .impact-item {
+        text-align: center;
+        opacity: 0;
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .impact-item:nth-child(1) { animation-delay: 0.4s; }
+    .impact-item:nth-child(2) { animation-delay: 0.6s; }
+    .impact-item:nth-child(3) { animation-delay: 0.8s; }
+
+    .impact-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .impact-item-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .impact-item-text {
+        font-size: 14px;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    /* ========================================
+       ANIMATIONS
+       ======================================== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes heroImageZoom {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* ========================================
+       RESPONSIVE DESIGN
+       ======================================== */
+    @media (max-width: 768px) {
+        .hero-section {
+            grid-template-columns: 1fr;
+            gap: 40px;
+            padding: 40px 20px;
+        }
+
+        .hero-image {
+            height: 350px;
+        }
+
+        .hero-content h1 {
+            font-size: 32px;
+        }
+
+        .hero-content .price-tag {
+            font-size: 28px;
+        }
+
+        .add-to-cart-section {
+            flex-direction: column;
+        }
+
+        .btn-add-cart,
+        .btn-wishlist {
+            width: 100%;
+        }
+
+        .cultural-journey-section {
+            padding: 60px 20px;
+        }
+
+        .section-title {
+            font-size: 28px;
+        }
+
+        .timeline::before {
+            left: 30px;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content,
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 80px;
+            margin-right: 0;
+            text-align: left;
+            width: calc(100% - 80px);
+        }
+
+        .timeline-marker {
+            left: 30px;
+        }
+
+        .social-impact-section {
+            padding: 60px 20px;
+        }
+
+        .impact-bullets {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="product-detail-container">
+    <!-- ========================================
+         HERO SECTION
+         ======================================== -->
+    <section class="hero-section">
+        <div class="hero-image">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" id="productImage">
+        </div>
+
+        <div class="hero-content">
+            <h1>{{ product.name }}</h1>
+            <div class="price-tag">₹{{ product.price|floatformat:0 }}</div>
+            <p class="description">{{ product.description }}</p>
+
+            <div class="add-to-cart-section">
+                <form method="POST" style="flex: 1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-add-cart add-to-cart-btn" id="addToCartBtn">
+                        🛒 Add to Cart
+                    </button>
+                </form>
+                <button class="btn-wishlist" id="wishlistBtn">❤️ Wishlist</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+         CULTURAL JOURNEY SECTION
+         ======================================== -->
+    {% if product.region or product.cultural_story or product.craft_process %}
+    <section class="cultural-journey-section">
+        <h2 class="section-title">Cultural Journey</h2>
+
+        <div class="timeline">
+            <!-- Origin Point -->
+            {% if product.region %}
+            <div class="timeline-item">
+                <div class="timeline-marker">📍</div>
+                <div class="timeline-content">
+                    <div class="timeline-label">Origin</div>
+                    <div class="timeline-title">{{ product.region }}</div>
+                    <div class="timeline-description">
+                        Crafted from the heart of {{ product.region }}, carrying centuries of tradition.
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Artisan Story -->
+            <div class="timeline-item">
+                <div class="timeline-marker">👨‍🎨</div>
+                <div class="timeline-content">
+                    <div class="timeline-label">Artisan</div>
+                    <div class="timeline-title">{{ product.artisan.first_name }} {{ product.artisan.last_name }}</div>
+                    <div class="timeline-description">
+                        {{ product.artisan.email }}<br>
+                        Dedicated to preserving traditional craftsmanship.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Craft Process -->
+            {% if product.craft_process %}
+            <div class="timeline-item">
+                <div class="timeline-marker">🔧</div>
+                <div class="timeline-content">
+                    <div class="timeline-label">Craft Process</div>
+                    <div class="timeline-title">Handcrafted with Care</div>
+                    <div class="timeline-description">
+                        {{ product.craft_process|truncatewords:50 }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Cultural Story -->
+            {% if product.cultural_story %}
+            <div class="timeline-item">
+                <div class="timeline-marker">📖</div>
+                <div class="timeline-content">
+                    <div class="timeline-label">Cultural Story</div>
+                    <div class="timeline-title">The Story Behind</div>
+                    <div class="timeline-description">
+                        {{ product.cultural_story|truncatewords:50 }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- ========================================
+         AUTHENTICITY SECTION
+         ======================================== -->
+    <section class="authenticity-section">
+        <h2 class="section-title">Authenticity & Verification</h2>
+
+        {% if product.is_verified %}
+            <div class="verification-badge">
+                <div class="badge-stamp">
+                    <div class="badge-stamp-text">Verified</div>
+                    <div class="badge-checkmark">✓</div>
+                </div>
+            </div>
+            <p class="verification-info">
+                ✓ Verified by <span class="verified-by-name">{{ product.verified_by.first_name }} {{ product.verified_by.last_name }}</span>
+            </p>
+            <p style="font-size: 14px; color: var(--text-light);">
+                This product has been authenticated by our cultural consultant team.
+            </p>
+        {% else %}
+            <div class="awaiting-verification">
+                ⏳ This product is awaiting verification by our cultural consultant team.
+            </div>
+            <p style="font-size: 14px; color: var(--text-light); margin-top: 15px;">
+                Every product goes through our rigorous verification process to ensure authenticity and fair trade practices.
+            </p>
+        {% endif %}
+    </section>
+
+    <!-- ========================================
+         SOCIAL IMPACT SECTION
+         ======================================== -->
+    <section class="social-impact-section">
+        <div class="impact-content">
+            <h2 class="section-title">Social Impact</h2>
+
+            <div class="impact-score-container">
+                <div class="impact-score-label">Artisan Empowerment Score</div>
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar" id="progressBar" data-target="{{ product.impact_score|default:0 }}"></div>
+                </div>
+                <div class="progress-text">
+                    <span class="progress-number" id="progressNumber">0</span>%
+                </div>
+            </div>
+
+            <div class="impact-bullets">
+                <div class="impact-item">
+                    <div class="impact-icon">💰</div>
+                    <div class="impact-item-title">Fair Wages</div>
+                    <div class="impact-item-text">100% of proceeds directly support the artisan's livelihood and family.</div>
+                </div>
+
+                <div class="impact-item">
+                    <div class="impact-icon">🎨</div>
+                    <div class="impact-item-title">Skill Preservation</div>
+                    <div class="impact-item-text">Your purchase helps preserve traditional arts and cultural heritage.</div>
+                </div>
+
+                <div class="impact-item">
+                    <div class="impact-icon">👨‍👩‍👧‍👦</div>
+                    <div class="impact-item-title">Community Growth</div>
+                    <div class="impact-item-text">Supporting local artisans strengthens entire communities.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ========================================
+    // 1. BUTTON RIPPLE EFFECT
+    // ========================================
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            this.classList.add('ripple');
+            setTimeout(() => {
+                this.classList.remove('ripple');
+            }, 600);
+        });
+    }
+
+    // ========================================
+    // 2. INTERSECTION OBSERVER - FADE-IN
+    // ========================================
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe timeline items for animation trigger
+    document.querySelectorAll('.timeline-item').forEach(item => {
+        observer.observe(item);
+    });
+
+    // ========================================
+    // 3. ANIMATED PROGRESS BAR
+    // ========================================
+    const progressBar = document.getElementById('progressBar');
+    const progressNumber = document.getElementById('progressNumber');
+
+    if (progressBar) {
+        const targetScore = parseInt(progressBar.getAttribute('data-target')) || 0;
+
+        // Trigger animation when section enters viewport
+        const progressObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !progressBar.classList.contains('animated')) {
+                    progressBar.classList.add('animated');
+                    animateProgressBar(targetScore);
+                    progressObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        progressObserver.observe(progressBar.closest('.progress-bar-wrapper'));
+    }
+
+    function animateProgressBar(target) {
+        let current = 0;
+        const increment = target / 100;
+        const duration = 2000;
+        const steps = 100;
+        const stepDuration = duration / steps;
+
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+
+            progressBar.style.width = current + '%';
+            progressNumber.textContent = Math.floor(current);
+        }, stepDuration);
+    }
+
+    // ========================================
+    // 4. WISHLIST BUTTON INTERACTION
+    // ========================================
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    if (wishlistBtn) {
+        wishlistBtn.addEventListener('click', function() {
+            this.style.transform = 'scale(1.1)';
+            this.innerHTML = this.innerHTML === '❤️ Wishlist' ? '❤️ Added!' : '❤️ Wishlist';
+            
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+    }
+
+    // ========================================
+    // 5. SMOOTH SCROLL TO SECTIONS
+    // ========================================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href !== '#' && document.querySelector(href)) {
+                e.preventDefault();
+                document.querySelector(href).scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+});
+</script>
+
+{% endblock %}
