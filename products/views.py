@@ -80,7 +80,12 @@ def add_to_cart(request, product_id):
         next_url = quote(request.get_full_path())
         return redirect(f"{reverse('login')}?next={next_url}")
 
-    product = get_object_or_404(Product, id=product_id, is_approved=True)
+    product = get_object_or_404(
+        Product.objects.filter(is_approved=True).exclude(
+            verification_status=Product.VerificationStatus.REJECTED
+        ),
+        id=product_id,
+    )
 
     cart = request.session.get("cart", {})
 

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Upload Product - Kalasetu{% endblock %}
+{% block title %}Add Product - Kalasetu{% endblock %}
 
 {% block content %}
 <style>
@@ -77,6 +77,16 @@
         font-size: 12px;
     }
 
+    .form-errors {
+        background: #fff4f4;
+        border: 1px solid #f5c6cb;
+        color: #8a1c1c;
+        padding: 12px 14px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+
     .form-actions {
         margin-top: 10px;
         display: flex;
@@ -114,32 +124,43 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
+            {% if form.errors %}
+                <div class="form-errors">
+                    <strong>Please fix the errors below.</strong>
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
             <div class="form-grid">
                 <div class="form-field full">
                     <label for="id_name">Product Name</label>
                     {{ form.name }}
+                    {{ form.name.errors }}
                 </div>
 
                 <div class="form-field full">
                     <label for="id_description">Description</label>
                     {{ form.description }}
+                    {{ form.description.errors }}
                     <span class="help-text">Describe materials, size, and cultural inspiration.</span>
                 </div>
 
                 <div class="form-field">
                     <label for="id_price">Price</label>
                     {{ form.price }}
+                    {{ form.price.errors }}
                 </div>
 
                 <div class="form-field">
                     <label for="id_image">Product Image</label>
                     {{ form.image }}
+                    {{ form.image.errors }}
                     <span class="help-text">Upload a clear image with good lighting.</span>
                 </div>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-primary">Upload Product</button>
+                <button type="submit" class="btn-primary">Add Product</button>
             </div>
         </form>
     </div>

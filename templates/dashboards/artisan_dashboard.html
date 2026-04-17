@@ -218,7 +218,7 @@
         </div>
         <div class="action-group">
             <a class="btn-secondary" href="{% url 'add_story' %}">Add Story</a>
-            <a class="btn-upload" href="{% url 'upload_product' %}">Upload New Product</a>
+            <a class="btn-upload" href="{% url 'upload_product' %}">Add Product</a>
         </div>
     </div>
 
@@ -259,7 +259,10 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="empty-state">No products yet. Upload your first product.</div>
+        <div class="empty-state">
+            <p>No products yet. Add your first product.</p>
+            <a class="btn-upload" href="{% url 'upload_product' %}">Add Product</a>
+        </div>
     {% endif %}
 
     <div class="story-section">
