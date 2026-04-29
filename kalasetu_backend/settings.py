@@ -266,7 +266,7 @@ CORS_ALLOW_HEADERS = [
 
 # Google reCAPTCHA
 RECAPTCHA_SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY', '').strip()
-
+    
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
