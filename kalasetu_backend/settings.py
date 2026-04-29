@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from urllib.parse import parse_qs, urlparse
 import os
 
 
@@ -30,6 +31,39 @@ def _load_env_file(file_path):
             value = value.strip().strip('"').strip("'")
             os.environ.setdefault(key, value)
 
+
+def _build_database_config():
+    database_url = os.getenv('DATABASE_URL', '').strip()
+
+    if database_url:
+        parsed_url = urlparse(database_url)
+        query_params = parse_qs(parsed_url.query)
+        database_name = parsed_url.path.lstrip('/')
+
+        database_config = {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': database_name,
+            'USER': parsed_url.username or '',
+            'PASSWORD': parsed_url.password or '',
+            'HOST': parsed_url.hostname or '',
+            'PORT': str(parsed_url.port or 5432),
+        }
+
+        sslmode = query_params.get('sslmode', [None])[0]
+        if sslmode:
+            database_config['OPTIONS'] = {'sslmode': sslmode}
+
+        return database_config
+
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'kalasetu'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+    }
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
@@ -43,12 +77,12 @@ _load_env_file(PROJECT_ROOT / '.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-46mz=a=h-r_71ko1ec5#@toxap($hr3vob4m4g2ox7zh3_lwj1'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-46mz=a=h-r_71ko1ec5#@toxap($hr3vob4m4g2ox7zh3_lwj1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # temporary for deployment
 
 
 # Application definition
@@ -74,13 +108,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'kalasetu_backend.urls'
@@ -108,14 +143,7 @@ WSGI_APPLICATION = 'kalasetu_backend.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'kalasetu_db',
-        'USER': 'postgres',
-        'PASSWORD': 'raj123',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': _build_database_config()
 }
 
 
@@ -153,7 +181,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
@@ -214,6 +244,13 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5174',
 ]
 
+extra_cors_origins = [
+    origin.strip()
+    for origin in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(CORS_ALLOWED_ORIGINS + extra_cors_origins))
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -229,4 +266,10 @@ CORS_ALLOW_HEADERS = [
 
 # Google reCAPTCHA
 RECAPTCHA_SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY', '').strip()
-
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+
