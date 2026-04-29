@@ -36,6 +36,8 @@ from .permissions import (
 User = get_user_model()
 
 
+
+
 def _verify_captcha_token(captcha_token):
     """Validate Google reCAPTCHA token using secret key from environment."""
     if not captcha_token:

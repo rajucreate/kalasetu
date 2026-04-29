@@ -25,18 +25,18 @@ router.register(r'artisans', ArtisanViewSet, basename='artisan')
 router.register(r'stories', ArtisanStoryViewSet, basename='story')
 
 urlpatterns = [
-    # Authentication
+    # Email / password authentication
     path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/register/', RegisterView.as_view(), name='register'),
-    
+
     # User profile
     path('auth/me/', CurrentUserView.as_view(), name='current_user'),
-    
+
     # Consultant endpoints
     path('consultant/pending/', ConsultantPendingView.as_view(), name='consultant_pending'),
     path('consultant/verify/<int:product_id>/', ConsultantVerifyView.as_view(), name='consultant_verify'),
-    
+
     # ViewSet routes
     path('', include(router.urls)),
 ]
