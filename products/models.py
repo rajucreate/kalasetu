@@ -21,7 +21,7 @@ class Product(models.Model):
 
     image = models.ImageField(upload_to="product_images/")
 
-    is_approved = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=True)  # Auto-approved; marketplace visibility gated by consultant verification
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Cultural Story Fields

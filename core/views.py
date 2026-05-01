@@ -12,7 +12,7 @@ from accounts.models import User, Role, ArtisanStory
  
 def landing_page(request):
     latest_products = Product.objects.filter(
-        is_approved=True
+        verification_status=Product.VerificationStatus.VERIFIED
     ).order_by("-created_at")[:3]
 
     context = {
@@ -66,10 +66,10 @@ def admin_dashboard(request):
     # === PRODUCT STATISTICS ===
     # Basic product counts
     total_products = Product.objects.count()
-    approved_products = Product.objects.filter(is_approved=True).count()
-    pending_products = Product.objects.filter(is_approved=False).count()
+    approved_products = Product.objects.filter(verification_status=Product.VerificationStatus.VERIFIED).count()
+    pending_products = Product.objects.filter(verification_status=Product.VerificationStatus.PENDING).count()
     
-    # Product approval rate (percentage)
+    # Product verification rate (percentage)
     approval_rate = (approved_products / total_products * 100) if total_products > 0 else 0
     
     # Recent products (last 7 days)
@@ -77,10 +77,10 @@ def admin_dashboard(request):
     
     # Products lists for moderation tables
     pending_products_list = Product.objects.filter(
-        is_approved=False
+        verification_status=Product.VerificationStatus.PENDING
     ).select_related('artisan').order_by('-created_at')
     approved_products_list = Product.objects.filter(
-        is_approved=True
+        verification_status=Product.VerificationStatus.VERIFIED
     ).select_related('artisan').order_by('-created_at')
     
     # === ARTISAN STATISTICS ===
@@ -89,14 +89,14 @@ def admin_dashboard(request):
         role=Role.ARTISAN
     ).annotate(
         product_count=Count('products'),
-        approved_count=Count('products', filter=Q(products__is_approved=True))
+        approved_count=Count('products', filter=Q(products__verification_status=Product.VerificationStatus.VERIFIED))
     ).order_by('-product_count')[:5]
     
     # === PRODUCT PRICING STATISTICS ===
     # Aggregate pricing data
     pricing_stats = Product.objects.aggregate(
         avg_price=Avg('price'),
-        total_value=Sum('price', filter=Q(is_approved=True))
+        total_value=Sum('price', filter=Q(verification_status=Product.VerificationStatus.VERIFIED))
     )
     
     # Build context dictionary
@@ -136,20 +136,21 @@ def admin_dashboard(request):
 @role_required(Role.ADMIN)
 @require_POST
 def approve_product(request, product_id):
-    product = get_object_or_404(Product, pk=product_id, is_approved=False)
-    product.is_approved = True
-    product.save(update_fields=["is_approved"])
-    messages.success(request, f"Approved product: {product.name}")
+    """[Deprecated] Admin approval no longer gates marketplace. Kept for backward compat."""
+    messages.info(request, "Admin approval is no longer required. Products are visible after consultant verification.")
     return redirect("admin_dashboard")
 
 
 @role_required(Role.ADMIN)
 @require_POST
 def reject_product(request, product_id):
-    product = get_object_or_404(Product, pk=product_id, is_approved=False)
+    product = get_object_or_404(Product, pk=product_id)
     product_name = product.name
-    product.delete()
-    messages.warning(request, f"Rejected and removed product: {product_name}")
+    product.verification_status = Product.VerificationStatus.REJECTED
+    product.is_approved = False
+    product.is_verified = False
+    product.save(update_fields=["verification_status", "is_approved", "is_verified"])
+    messages.warning(request, f"Rejected product: {product_name}")
     return redirect("admin_dashboard")
 
 
@@ -164,8 +165,8 @@ def artisan_dashboard(request):
     ).order_by("-created_at")
 
     total_products = artisan_products.count()
-    approved_products = artisan_products.filter(is_approved=True).count()
-    pending_products = artisan_products.filter(is_approved=False).count()
+    approved_products = artisan_products.filter(verification_status=Product.VerificationStatus.VERIFIED).count()
+    pending_products = artisan_products.filter(verification_status=Product.VerificationStatus.PENDING).count()
 
     context = {
         "artisan_products": artisan_products,
@@ -184,7 +185,7 @@ def buyer_dashboard(request):
     cart_item_count = sum(cart.values()) if cart else 0
 
     latest_products = Product.objects.filter(
-        is_approved=True
+        verification_status=Product.VerificationStatus.VERIFIED
     ).select_related("artisan").order_by("-created_at")[:3]
 
     context = {
@@ -211,7 +212,6 @@ def consultant_dashboard(request):
     ).count()
 
     pending_products = Product.objects.filter(
-        is_approved=True,
         verification_status=Product.VerificationStatus.PENDING
     ).select_related("artisan").order_by("-created_at")
 
@@ -229,7 +229,7 @@ def consultant_dashboard(request):
 @role_required(Role.CONSULTANT)
 @require_POST
 def verify_product(request, pk):
-    product = get_object_or_404(Product, pk=pk, is_approved=True)
+    product = get_object_or_404(Product, pk=pk, verification_status=Product.VerificationStatus.PENDING)
     action = request.POST.get("action")
     note = (request.POST.get("verification_note") or "").strip()
 

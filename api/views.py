@@ -189,18 +189,20 @@ class ProductViewSet(viewsets.ModelViewSet):
             if user.role in ['ADMIN', 'CONSULTANT']:
                 queryset = queryset
             elif user.role == 'ARTISAN':
-                # Show own products + verified products
+                # Show own products + consultant-verified products
                 queryset = queryset.filter(
                     Q(artisan=user) |
-                    Q(is_approved=True, verification_status=Product.VerificationStatus.VERIFIED)
+                    Q(verification_status=Product.VerificationStatus.VERIFIED)
                 )
             else:
-                queryset = queryset.filter(is_approved=True).exclude(
-                    verification_status=Product.VerificationStatus.REJECTED
+                # Buyers and other roles: only consultant-verified products
+                queryset = queryset.filter(
+                    verification_status=Product.VerificationStatus.VERIFIED
                 )
         else:
-            queryset = queryset.filter(is_approved=True).exclude(
-                verification_status=Product.VerificationStatus.REJECTED
+            # Unauthenticated users: only consultant-verified products
+            queryset = queryset.filter(
+                verification_status=Product.VerificationStatus.VERIFIED
             )
 
         search = params.get('search')
@@ -298,7 +300,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated, IsConsultantOrAdmin])
     def pending(self, request):
-        """Get pending verification products (Consultant only)."""
+        """Get all pending-verification products for consultant review."""
         products = Product.objects.filter(
             verification_status=Product.VerificationStatus.PENDING
         ).select_related('artisan', 'verified_by').order_by('-created_at')
@@ -325,9 +327,10 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated, IsAdmin])
     def pending_approval(self, request):
-        """Get products waiting for admin approval."""
-        products = Product.objects.filter(is_approved=False).exclude(
-            verification_status=Product.VerificationStatus.REJECTED
+        """[Deprecated] Admin approval is no longer required; consultant verification is the single gate.
+        Returns products with PENDING verification status for reference."""
+        products = Product.objects.filter(
+            verification_status=Product.VerificationStatus.PENDING
         ).select_related('artisan', 'verified_by').order_by('-created_at')
 
         page = self.paginate_queryset(products)
@@ -340,21 +343,16 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'], permission_classes=[IsAuthenticated, IsAdmin])
     def approve(self, request, pk=None):
-        """Approve product for marketplace visibility (Admin only)."""
-        product = self.get_object()
-        product.is_approved = True
-
-        # If previously rejected, reset to pending for consultant review.
-        if product.verification_status == Product.VerificationStatus.REJECTED:
-            product.verification_status = Product.VerificationStatus.PENDING
-            product.is_verified = False
-
-        product.save(update_fields=['is_approved', 'verification_status', 'is_verified'])
-        return Response({'message': 'Product approved successfully.'}, status=status.HTTP_200_OK)
+        """[Deprecated] Admin approval no longer gates marketplace. Consultant verification is sufficient.
+        This endpoint is a no-op kept for backward compatibility."""
+        return Response(
+            {'message': 'Admin approval is no longer required. Products are shown after consultant verification.'},
+            status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=['patch'], permission_classes=[IsAuthenticated, IsAdmin])
     def reject(self, request, pk=None):
-        """Reject product and remove from marketplace (Admin only)."""
+        """Reject product via admin (sets verification_status=REJECTED and is_approved=False)."""
         product = self.get_object()
         product.is_approved = False
         product.is_verified = False

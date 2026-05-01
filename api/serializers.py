@@ -165,3 +165,28 @@ class ProductVerificationSerializer(serializers.ModelSerializer):
         if value < 0 or value > 100:
             raise serializers.ValidationError("Impact score must be between 0 and 100.")
         return value
+
+    def update(self, instance, validated_data):
+        """Auto-sync is_approved and is_verified with the consultant's decision."""
+        from django.utils import timezone
+        v_status = validated_data.get('verification_status', instance.verification_status)
+        if v_status == Product.VerificationStatus.VERIFIED:
+            instance.is_approved = True
+            instance.is_verified = True
+            instance.verified_at = timezone.now()
+        elif v_status == Product.VerificationStatus.REJECTED:
+            instance.is_approved = False
+            instance.is_verified = False
+            instance.verified_at = timezone.now()
+        instance.verification_status = v_status
+        instance.verification_note = validated_data.get('verification_note', instance.verification_note)
+        instance.impact_score = validated_data.get('impact_score', instance.impact_score)
+        # verified_by is set by the view via save(verified_by=request.user)
+        verified_by = validated_data.get('verified_by', None)
+        if verified_by:
+            instance.verified_by = verified_by
+        instance.save(update_fields=[
+            'verification_status', 'verification_note', 'impact_score',
+            'is_approved', 'is_verified', 'verified_at',
+        ])
+        return instance

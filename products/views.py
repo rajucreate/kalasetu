@@ -27,9 +27,7 @@ def upload_product(request):
 
 def product_list(request):
     products = Product.objects.filter(
-        is_approved=True
-    ).exclude(
-        verification_status=Product.VerificationStatus.REJECTED
+        verification_status=Product.VerificationStatus.VERIFIED
     ).order_by("-created_at")
     return render(request, "products/product_list.html", {"products": products})
 
@@ -40,8 +38,8 @@ def product_detail(request, pk):
     Handles Add to Cart functionality.
     """
     product = get_object_or_404(
-        Product.objects.filter(is_approved=True).exclude(
-            verification_status=Product.VerificationStatus.REJECTED
+        Product.objects.filter(
+            verification_status=Product.VerificationStatus.VERIFIED
         ),
         id=pk,
     )
@@ -81,8 +79,8 @@ def add_to_cart(request, product_id):
         return redirect(f"{reverse('login')}?next={next_url}")
 
     product = get_object_or_404(
-        Product.objects.filter(is_approved=True).exclude(
-            verification_status=Product.VerificationStatus.REJECTED
+        Product.objects.filter(
+            verification_status=Product.VerificationStatus.VERIFIED
         ),
         id=product_id,
     )
